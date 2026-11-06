@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title> المصفوفات </title>
+</head>
+<body>
+     <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6fa; }
+        .analyzer-box { background: #827878; padding: 20px; border-radius: 8px; max-width: 400px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, button { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
+        button { background-color: #92b7ee; color: rgb(88, 49, 49); border: none; cursor: pointer; }
+        .report { margin-top: 15px; padding: 15px; background: #a5a9b1; border-radius: 5px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="analyzer-box">
+        <h3>درجات الطالب</h3>
+        
+        <label>الدرجة الأولى:</label>
+        <input type="number" id="grade1" placeholder="مثال: 90">
+        
+        <label>الدرجة الثانية:</label>
+        <input type="number" id="grade2" placeholder="مثال: 80">
+        
+        <label>الدرجة الثالثة:</label>
+        <input type="number" id="grade3" placeholder="مثال: 70">
+        
+        <label>نسبة الحضور (%):</label>
+        <input type="number" id="attendance" placeholder="مثال  85">
+        
+        <button id="analyzeBtn">تحليل النتيجة</button>
+
+        <!-- منطقة عرض التقرير -->
+        <div id="reportBox" class="report"></div>
+    </div>
+
+ <script>
+    // تعريف مصفوفة الطلاب  اولأ
+    const students  =[
+        {id: 1, average: 85},
+        {id: 2, average: 42},  // طالب متعثر
+        {id: 3, average: 90},  // طالب متعثر
+        {id: 4, average: 48}
+    ];
+   //2  &  1 : تصفية المتغثرين و اضافة درجات الرأفة //
+    const strugglingStudents = students.filter(s => s.average >= 40 && s.average <= 49);
+    const upgradedGrades = strugglingStudents.map(s => s.average +5);
+
+    // 3: جمع الدرجات بعد التعديل //
+    const totalUpgraded = upgradedGrades.reduce((sum, grade) => sum + grade, 0);
+
+    // 4: حساب المتوسط مع رفع العملية //
+    let upgradedAverage =0;
+    if (strugglingStudents.length > 0) {
+        upgradedAverage = totalUpgraded / strugglingStudents.length;
+    }
+    console.log("متوسط درجات الطلاب بعد الرأفة", upgradedAverage);
+    </script>
+     <script>
+        // 1. تعريف ثوابت قواعد العمل
+        const PASS_MARK = 50;
+        const MIN_ATTENDANCE = 75;
+
+        // 2. دالة لحساب التقدير بالحروف
+        function getGradeLetter(average) {
+            if (average >= 90) return "A";
+            if (average >= 80) return "B";
+            if (average >= 70) return "C";
+            if (average >= 60) return "D";
+            if (average >= PASS_MARK) return "E";
+            return "F";
+        }
+
+        // 3. دالة لحساب النتيجة النهائية
+        function getFinalResult(average, attendance) {
+            if (average >= PASS_MARK && attendance >= MIN_ATTENDANCE) {
+                return "ناجح (Pass)";
+            } else {
+                return "يحتاج مراجعة (Needs Review)";
+            }
+        }
+
+        // 4. ربط حدث النقر بالزر
+        document.getElementById("analyzeBtn").addEventListener("click", function() {
+            
+            // قراءة النصوص الخام أولاً وحذف المسافات الزائدة
+            const rawG1 = document.getElementById("grade1").value.trim();
+            const rawG2 = document.getElementById("grade2").value.trim();
+            const rawG3 = document.getElementById("grade3").value.trim();
+            const rawAtt = document.getElementById("attendance").value.trim();
+            const reportBox = document.getElementById("reportBox");
+
+            // التحقق من عدم وجود حقول فارغة قبل أي عملية حسابية
+            if (rawG1 === "" || rawG2 === "" || rawG3 === "" || rawAtt === "") {
+                reportBox.style.display = "block";
+                reportBox.innerHTML = `<p style="color: red; font-weight: bold;">خطأ: الرجاء عدم ترك أي حقل فارغاً وإدخال جميع الدرجات.</p>`;
+                return; // إيقاف التنفيذ
+            }
+
+            // التحويل الآمن للنصوص إلى أرقام
+            const g1 = Number(rawG1);
+            const g2 = Number(rawG2);
+            const g3 = Number(rawG3);
+            const att = Number(rawAtt);
+
+            // تخزين الدرجات في مصفوفة وحساب المجموع باستخدام حلقة تكرارية
+            const grades = [g1, g2, g3];
+            let total = 0;
+            
+            for (let i = 0; i < grades.length; i++) {
+                total += grades[i];
+            }
+            
+            // حساب المتوسط واستخراج النتائج
+            const average = total / grades.length;
+            const letter = getGradeLetter(average);
+            const result = getFinalResult(average, att);
+
+            // 5. عرض التقرير باستخدام قوالب النصوص
+            reportBox.style.display = "block"; 
+            reportBox.innerHTML = `
+                <h4>تقرير الطالب:</h4>
+                <p>إجمالي الدرجات: <strong>${total}</strong></p>
+                <p>المتوسط: <strong>${average.toFixed(1)}</strong></p>
+                <p>التقدير: <strong>${letter}</strong></p>
+                <p>الحالة: <strong>${result}</strong></p>
+            `;
+        });
+    </script>
+</body>
+</html>
