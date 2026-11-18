@@ -1,133 +1,98 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title> المصفوفات </title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="تطبيق ويب لإدارة نتائج الطلاب وتطبيق لجنة الرأفة">
+  <title>نظام إدارة النتائج</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6fa; }
-        .analyzer-box { background: #827878; padding: 20px; border-radius: 8px; max-width: 400px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input, button { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
-        button { background-color: #92b7ee; color: rgb(88, 49, 49); border: none; cursor: pointer; }
-        .report { margin-top: 15px; padding: 15px; background: #a5a9b1; border-radius: 5px; display: none; }
-    </style>
-</head>
-<body>
+  <main class="container py-4 py-md-5">
+    <header class="text-center mb-4">
+      <h1 class="fw-bold">نظام إدارة النتائج</h1>
+      <p class="text-secondary mb-0">إضافة الطلاب وتحليل النتائج وتفعيل لجنة الرأفة</p>
+    </header>
 
-    <div class="analyzer-box">
-        <h3>درجات الطالب</h3>
-        
-        <label>الدرجة الأولى:</label>
-        <input type="number" id="grade1" placeholder="مثال: 90">
-        
-        <label>الدرجة الثانية:</label>
-        <input type="number" id="grade2" placeholder="مثال: 80">
-        
-        <label>الدرجة الثالثة:</label>
-        <input type="number" id="grade3" placeholder="مثال: 70">
-        
-        <label>نسبة الحضور (%):</label>
-        <input type="number" id="attendance" placeholder="مثال  85">
-        
-        <button id="analyzeBtn">تحليل النتيجة</button>
+    <section class="card shadow-sm border-0 mb-4">
+      <div class="card-body p-4">
+        <h2 class="section-title h5 mb-3">بيانات الطالب</h2>
 
-        <!-- منطقة عرض التقرير -->
-        <div id="reportBox" class="report"></div>
-    </div>
+        <form id="studentForm" novalidate>
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="studentName" class="form-label">اسم الطالب</label>
+              <input type="text" class="form-control" id="studentName"
+                     placeholder="اكتب اسم الطالب" autocomplete="off">
+            </div>
 
- <script>
-    // تعريف مصفوفة الطلاب  اولأ
-    const students  =[
-        {id: 1, average: 85},
-        {id: 2, average: 42},  // طالب متعثر
-        {id: 3, average: 90},  // طالب متعثر
-        {id: 4, average: 48}
-    ];
-   //2  &  1 : تصفية المتغثرين و اضافة درجات الرأفة //
-    const strugglingStudents = students.filter(s => s.average >= 40 && s.average <= 49);
-    const upgradedGrades = strugglingStudents.map(s => s.average +5);
+            <div class="col-12 col-md-4">
+              <label for="grade1" class="form-label">درجة المادة الأولى</label>
+              <input type="number" class="form-control" id="grade1"
+                     min="0" max="100" step="any" placeholder="من 0 إلى 100">
+            </div>
+            <div class="col-12 col-md-4">
+              <label for="grade2" class="form-label">درجة المادة الثانية</label>
+              <input type="number" class="form-control" id="grade2"
+                     min="0" max="100" step="any" placeholder="من 0 إلى 100">
+            </div>
+            <div class="col-12 col-md-4">
+              <label for="grade3" class="form-label">درجة المادة الثالثة</label>
+              <input type="number" class="form-control" id="grade3"
+                     min="0" max="100" step="any" placeholder="من 0 إلى 100">
+            </div>
 
-    // 3: جمع الدرجات بعد التعديل //
-    const totalUpgraded = upgradedGrades.reduce((sum, grade) => sum + grade, 0);
+            <div class="col-12">
+              <label for="attendance" class="form-label">نسبة الحضور</label>
+              <input type="number" class="form-control" id="attendance"
+                     min="0" max="100" step="any" placeholder="من 0 إلى 100">
+            </div>
+          </div>
 
-    // 4: حساب المتوسط مع رفع العملية //
-    let upgradedAverage =0;
-    if (strugglingStudents.length > 0) {
-        upgradedAverage = totalUpgraded / strugglingStudents.length;
-    }
-    console.log("متوسط درجات الطلاب بعد الرأفة", upgradedAverage);
-    </script>
-     <script>
-        // 1. تعريف ثوابت قواعد العمل
-        const PASS_MARK = 50;
-        const MIN_ATTENDANCE = 75;
+          <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+            <button type="submit" class="btn btn-primary px-4">إضافة طالب</button>
+            <button type="button" id="graceButton" class="btn btn-success px-4">
+              تفعيل لجنة الرأفة
+            </button>
+          </div>
+        </form>
 
-        // 2. دالة لحساب التقدير بالحروف
-        function getGradeLetter(average) {
-            if (average >= 90) return "A";
-            if (average >= 80) return "B";
-            if (average >= 70) return "C";
-            if (average >= 60) return "D";
-            if (average >= PASS_MARK) return "E";
-            return "F";
-        }
+        <div id="errorBox" class="alert alert-danger mt-3 mb-0 d-none"
+             role="alert" aria-live="polite"></div>
+        <div id="successBox" class="alert alert-success mt-3 mb-0 d-none"
+             role="status" aria-live="polite"></div>
+      </div>
+    </section>
 
-        // 3. دالة لحساب النتيجة النهائية
-        function getFinalResult(average, attendance) {
-            if (average >= PASS_MARK && attendance >= MIN_ATTENDANCE) {
-                return "ناجح (Pass)";
-            } else {
-                return "يحتاج مراجعة (Needs Review)";
-            }
-        }
+    <section class="card shadow-sm border-0 mb-4">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="section-title h5 mb-0">قائمة الطلاب</h2>
+          <span id="studentsCount" class="badge text-bg-primary">0 طالب</span>
+        </div>
+        <div id="studentsList">
+          <p class="text-secondary mb-0">لم تتم إضافة أي طالب حتى الآن.</p>
+        </div>
+      </div>
+    </section>
 
-        // 4. ربط حدث النقر بالزر
-        document.getElementById("analyzeBtn").addEventListener("click", function() {
-            
-            // قراءة النصوص الخام أولاً وحذف المسافات الزائدة
-            const rawG1 = document.getElementById("grade1").value.trim();
-            const rawG2 = document.getElementById("grade2").value.trim();
-            const rawG3 = document.getElementById("grade3").value.trim();
-            const rawAtt = document.getElementById("attendance").value.trim();
-            const reportBox = document.getElementById("reportBox");
+    <section class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h2 class="section-title h5 mb-3">التقرير النهائي للجنة الرأفة</h2>
+        <div id="reportBox" aria-live="polite">
+          <p class="text-secondary mb-0">اضغط على زر «تفعيل لجنة الرأفة» لعرض التقرير.</p>
+        </div>
+      </div>
+    </section>
 
-            // التحقق من عدم وجود حقول فارغة قبل أي عملية حسابية
-            if (rawG1 === "" || rawG2 === "" || rawG3 === "" || rawAtt === "") {
-                reportBox.style.display = "block";
-                reportBox.innerHTML = `<p style="color: red; font-weight: bold;">خطأ: الرجاء عدم ترك أي حقل فارغاً وإدخال جميع الدرجات.</p>`;
-                return; // إيقاف التنفيذ
-            }
+    <footer class="text-center text-secondary small mt-4">
+      مشروع JavaScript - نظام إدارة النتائج
+    </footer>
+  </main>
 
-            // التحويل الآمن للنصوص إلى أرقام
-            const g1 = Number(rawG1);
-            const g2 = Number(rawG2);
-            const g3 = Number(rawG3);
-            const att = Number(rawAtt);
-
-            // تخزين الدرجات في مصفوفة وحساب المجموع باستخدام حلقة تكرارية
-            const grades = [g1, g2, g3];
-            let total = 0;
-            
-            for (let i = 0; i < grades.length; i++) {
-                total += grades[i];
-            }
-            
-            // حساب المتوسط واستخراج النتائج
-            const average = total / grades.length;
-            const letter = getGradeLetter(average);
-            const result = getFinalResult(average, att);
-
-            // 5. عرض التقرير باستخدام قوالب النصوص
-            reportBox.style.display = "block"; 
-            reportBox.innerHTML = `
-                <h4>تقرير الطالب:</h4>
-                <p>إجمالي الدرجات: <strong>${total}</strong></p>
-                <p>المتوسط: <strong>${average.toFixed(1)}</strong></p>
-                <p>التقدير: <strong>${letter}</strong></p>
-                <p>الحالة: <strong>${result}</strong></p>
-            `;
-        });
-    </script>
+  <script src="js/main.js" defer></script>
 </body>
 </html>

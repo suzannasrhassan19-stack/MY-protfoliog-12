@@ -1,0 +1,74 @@
+/* إعدادات عامة للواجهة */
+:root {
+  --page-bg: #f4f7fb;
+  --primary-dark: #183153;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--page-bg);
+  color: #243247;
+  font-family: Tahoma, Arial, sans-serif;
+}
+
+header h1 {
+  color: var(--primary-dark);
+}
+
+.card {
+  border-radius: 16px;
+}
+
+.section-title {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+.form-label {
+  font-weight: 600;
+}
+
+.form-control {
+  min-height: 46px;
+  border-radius: 10px;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
+}
+
+.btn {
+  min-height: 44px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.student-item,
+.report-student {
+  padding: 12px 14px;
+  border: 1px solid #e7edf5;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.student-item + .student-item,
+.report-student + .report-student {
+  margin-top: 10px;
+}
+
+.stat-box {
+  background: #f1f6ff;
+  border: 1px solid #dce8fb;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+@media (max-width: 575.98px) {
+  main.container {
+    padding-inline: 14px;
+  }
+
+  .card-body {
+    padding: 1.1rem !important;
+  }
+}
